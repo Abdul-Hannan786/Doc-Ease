@@ -1,0 +1,7 @@
+Doctor Management System Requirements
+
+1)First to check if there is need of a sidebar if needed then we will copy it from javascipt mastery
+
+2)And also to check the forms if forms are somewhere like javascrit mastery then we will cpy that if not then we will create our own and i mean all the forms which include signup, signin, patient info, doctor info
+
+3)
