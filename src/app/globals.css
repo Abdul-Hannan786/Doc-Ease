@@ -129,7 +129,7 @@ body {
     @apply text-[14px] leading-[20px] font-normal;
   }
   .button {
-    @apply text-[14px] leading-[20px] font-medium;
+    @apply text-[16px] leading-[20px] font-medium;
   }
   .caption {
     @apply text-[12px] leading-[16px] font-normal;
@@ -143,7 +143,10 @@ body {
     @apply mx-auto max-w-7xl px-5;
   }
   .primary-btn {
-    @apply bg-brand hover:bg-brand-100 transition-all rounded-2xl button !important;
+    @apply bg-brand hover:bg-brand-100 transition-all rounded-full button !important;
+  }
+  .google-btn {
+    @apply bg-white h-[66px] hover:bg-gray-100 transition-all rounded-full button !important;
   }
   .flex-center {
     @apply flex items-center justify-center;
@@ -306,7 +309,7 @@ body {
 
   /* AuthForm */
   .auth-form {
-    @apply flex max-h-[600px] w-full max-w-[580px] flex-col justify-center space-y-6 transition-all lg:h-full !important;
+    @apply flex max-h-[700px] w-full max-w-[580px] flex-col justify-center space-y-5 transition-all lg:h-full !important;
   }
   .form-title {
     @apply h1 text-center text-light-100 md:text-left !important;
