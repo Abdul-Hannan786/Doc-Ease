@@ -71,7 +71,7 @@ const AuthForm = ({ type }: { type: AuthFromType }) => {
                   <FormLabel className="shad-form-label ">Email</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Enter your full name"
+                      placeholder="Enter your email"
                       className="shad-input"
                       {...field}
                     />
@@ -83,14 +83,14 @@ const AuthForm = ({ type }: { type: AuthFromType }) => {
           />
           <FormField
             control={form.control}
-            name="fullName"
+            name="password"
             render={({ field }) => (
               <FormItem>
                 <div className="shad-form-item">
-                  <FormLabel className="shad-form-label ">Full Name</FormLabel>
+                  <FormLabel className="shad-form-label ">Password</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Enter your full name"
+                      placeholder="Enter your password"
                       className="shad-input"
                       {...field}
                     />
@@ -100,7 +100,9 @@ const AuthForm = ({ type }: { type: AuthFromType }) => {
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <Button type="submit" className="form-submit-button">
+          {type === "sign-in" ? "Sign In" : "Sign Up"}
+          </Button>
         </form>
       </Form>
     </>

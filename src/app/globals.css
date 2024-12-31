@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  @font-face {
+    font-family: 'Poppins';
+    font-weight: 500;
+    src: url('https://fonts.gstatic.com/s/poppins/v15/pxiEyp8kv8JHgFVrFJA.woff2') format('woff2');
+  }
+  
+}
+
 @layer base {
   * {
     @apply scroll-smooth;
@@ -134,7 +143,7 @@
     @apply mx-auto max-w-7xl px-5;
   }
   .primary-btn {
-    @apply bg-brand hover:bg-brand-100 transition-all rounded-full button !important;
+    @apply bg-brand hover:bg-brand-100 transition-all rounded-2xl button !important;
   }
   .flex-center {
     @apply flex items-center justify-center;
@@ -297,7 +306,7 @@
 
   /* AuthForm */
   .auth-form {
-    @apply flex max-h-[800px] w-full max-w-[580px] flex-col justify-center space-y-6 transition-all lg:h-full lg:space-y-8 !important;
+    @apply flex max-h-[600px] w-full max-w-[580px] flex-col justify-center space-y-6 transition-all lg:h-full !important;
   }
   .form-title {
     @apply h1 text-center text-light-100 md:text-left !important;
