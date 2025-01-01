@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
+import React from "react";
 
-export default function Home() {
+const LandingPage = () => {
   return (
     <div className="bg-gradient-to-b from-[#FA7275] to-[#ffb3b5] min-h-screen flex flex-col">
       {/* Header */}
@@ -13,7 +14,7 @@ export default function Home() {
           <nav>
             <Link
               href="/signin"
-              className="text-[#FA7275] font-semibold px-4 py-2 hover:text-white hover:bg-[#FA7275] rounded-full transition"
+              className="text-[#FA7275] font-semibold px-4 py-2 hover:text-white hover:bg-[#FA7275] rounded-lg transition"
             >
               Login
             </Link>
@@ -59,18 +60,18 @@ export default function Home() {
       <section className="bg-white py-12">
         <div className="container mx-auto px-6 text-center">
           <h3 className="text-3xl font-bold text-[#FA7275] mb-6">
-            Why Choose Doc Ease?
+            Why Choose DocEase?
           </h3>
           <div className="flex flex-wrap justify-center gap-6">
             {[
               {
                 title: "Easy Appointments",
-                description:
-                  "Schedule doctor visits with just a few clicks.",
+                description: "Schedule doctor visits with just a few clicks.",
               },
               {
-                title: "24/7 Access",
-                description: "Book appointments anytime, anywhere with our user-friendly platform.",
+                title: "Reminders",
+                description:
+                  "Never miss an appointment with timely notifications.",
               },
               {
                 title: "Doctor Availability",
@@ -104,7 +105,7 @@ export default function Home() {
               {
                 name: "Maria Ahmed",
                 feedback:
-                  "The platform is so easy to use. Booking appointments has never been simpler!",
+                  "I love the reminders feature. No more missing appointments!",
               },
               {
                 name: "John Doe",
@@ -116,7 +117,7 @@ export default function Home() {
                 key={index}
                 className="bg-white text-[#FA7275] p-6 rounded-lg shadow-md w-80 hover:scale-105 transition-transform"
               >
-                <p className="italic">&quot;{testimonial.feedback}&quot;</p>
+                <p className="italic">"{testimonial.feedback}"</p>
                 <h4 className="mt-4 font-bold">{testimonial.name}</h4>
               </div>
             ))}
@@ -130,4 +131,6 @@ export default function Home() {
       </footer>
     </div>
   );
-}
+};
+
+export default LandingPage;
