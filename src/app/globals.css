@@ -145,9 +145,6 @@ body {
   .primary-btn {
     @apply bg-brand hover:bg-brand-100 transition-all rounded-full button !important;
   }
-  .google-btn {
-    @apply bg-white h-[66px] hover:bg-gray-100 transition-all rounded-full button !important;
-  }
   .flex-center {
     @apply flex items-center justify-center;
   }

@@ -30,7 +30,7 @@ type AuthFromType = "sign-in" | "sign-up";
 
 const authFormSchema = (formType: AuthFromType) => {
   return z.object({
-    email: z.string().email(),
+    email: z.string().email("Enter a valid email address"),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters long")
@@ -63,6 +63,7 @@ const AuthForm = ({ type }: { type: AuthFromType }) => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
+    form.reset()
   };
   return (
     <>
