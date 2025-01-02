@@ -1,7 +1,7 @@
-import DoctorInnfoForm from "@/components/DoctorInnfoForm";
+import DoctorInfoForm from "@/components/DoctorInfoForm";
 
 const DoctorInfo = () => {
-  return <DoctorInnfoForm />;
+  return <DoctorInfoForm />;
 };
 
 export default DoctorInfo;

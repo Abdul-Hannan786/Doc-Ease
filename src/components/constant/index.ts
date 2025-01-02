@@ -1,4 +1,4 @@
-export const specilization = [
+export const specialization = [
   "General Physician",
   "Cardiologist",
   "Dermatologist",

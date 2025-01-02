@@ -24,7 +24,7 @@ import { useState } from "react";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import Image from "next/image";
-import { specilization } from "./constant";
+import { specialization } from "./constant";
 
 const authFormSchema = () => {
   return z.object({
@@ -39,7 +39,7 @@ const authFormSchema = () => {
     }, "Invalid file type. Only JPEG, PNG, and GIF are allowed."),
     specialization: z
       .string()
-      .refine((value) => specilization.includes(value), {
+      .refine((value) => specialization.includes(value), {
         message: "Please select a specialization from the list.",
       }),
     gender: z
@@ -55,7 +55,7 @@ const authFormSchema = () => {
   });
 };
 
-const DoctorInnfoForm = () => {
+const DoctorInfoForm = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
 
@@ -154,7 +154,7 @@ const DoctorInnfoForm = () => {
                               />
                             </SelectTrigger>
                             <SelectContent className="border-none">
-                              {specilization.map((spec) => (
+                              {specialization.map((spec) => (
                                 <SelectItem
                                   key={spec}
                                   value={spec}
@@ -352,4 +352,4 @@ const DoctorInnfoForm = () => {
   );
 };
 
-export default DoctorInnfoForm;
+export default DoctorInfoForm;
