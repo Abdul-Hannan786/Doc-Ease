@@ -25,6 +25,7 @@ import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import Image from "next/image";
 import { specialization } from "./constant";
+import { useRef } from "react";
 
 const authFormSchema = () => {
   return z.object({
@@ -32,11 +33,18 @@ const authFormSchema = () => {
       .string()
       .min(3, "Name must be at least 3 characters long")
       .max(50, "Name must not exceed 50 characters"),
-    picture: z.custom<File>((file) => {
-      if (!file) return false;
-      const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
-      return allowedTypes.includes(file.type);
-    }, "Invalid file type. Only JPEG, PNG, and GIF are allowed."),
+    picture: z
+      .instanceof(File, { message: "Please select a file" })
+      .refine(
+        (file) =>
+          ["image/png", "image/jpeg", "image/jpg", "image/gif"].includes(
+            file.type
+          ),
+        { message: "Only image files (PNG, JPEG, JPG, GIF) are allowed." }
+      )
+      .refine((file) => file.size <= 5 * 1024 * 1024, {
+        message: "File size should not exceed 5MB.",
+      }),
     specialization: z
       .string()
       .refine((value) => specialization.includes(value), {
@@ -58,6 +66,7 @@ const authFormSchema = () => {
 const DoctorInfoForm = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const formSchema = authFormSchema();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -75,6 +84,9 @@ const DoctorInfoForm = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
     form.reset();
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // Clear the file input
+    }
   };
 
   return (
@@ -123,11 +135,19 @@ const DoctorInfoForm = () => {
                         </FormLabel>
                         <FormControl>
                           <Input
+                            ref={(e) => {
+                              fileInputRef.current = e;
+                              field.ref(e);
+                            }}
                             id="picture"
                             type="file"
                             placeholder="Choose a file"
                             className="shad-input mt-1"
-                            {...field}
+                            accept="image/png, image/jpeg, image/jpg, image/gif"
+                            onChange={(e) =>
+                              field.onChange(e.target.files?.[0])
+                            }
+                            onBlur={field.onBlur}
                           />
                         </FormControl>
                       </div>
