@@ -22,10 +22,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Textarea } from "./ui/textarea";
+
 import { Button } from "./ui/button";
 import Image from "next/image";
-import { specialization } from "./constant";
+import { experience, specialization } from "../constant";
 import { useRef } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "./ui/calendar";
+import { cn } from "@/lib/utils";
+import { format, getMonth, getYear, setMonth, setYear } from "date-fns";
 
 const authFormSchema = () => {
   return z.object({
@@ -50,6 +56,9 @@ const authFormSchema = () => {
       .refine((value) => specialization.includes(value), {
         message: "Please select a specialization from the list.",
       }),
+    experience: z.string().refine((value) => experience.includes(value), {
+      message: "Please select experience from the list.",
+    }),
     gender: z
       .string()
       .refine(
@@ -60,12 +69,42 @@ const authFormSchema = () => {
       .string()
       .min(3, "Hospital name must be at least 3 characters long"),
     address: z.string().min(3, "Address must be at least 3 characters long"),
+    number: z
+      .string()
+      .min(11, "Number must be at least 11 characters long")
+      .max(15, "Number must be at most 15 characters long")
+      .regex(
+        /^\+?[0-9]+$/,
+        "Phone number must contain only numbers and may start with +"
+      ),
+    fees: z.preprocess((value) => {
+      if (value === "" || value === undefined || value === null) {
+        return 0;
+      }
+      return parseFloat(value as string);
+    }, z.number().min(1, { message: "Fees must be at least 1 PKR." }).max(100000, { message: "Fees cannot exceed 100,000 PKR." })),
+    bio: z
+      .string()
+      .min(10, "Bio must be at least 10 characters long")
+      .max(1000, "Bio must not exceed 100 characters"),
+    dob: z.date().refine((date) => date < new Date(), {
+      message: "Date must be in the past",
+    }),
   });
 };
 
-const DoctorInfoForm = () => {
+interface DatePickerProps {
+  startYear?: number;
+  endYear?: number;
+}
+
+const DoctorInfoForm = ({
+  startYear = getYear(new Date()) - 100,
+  endYear = getYear(new Date()) + 100,
+}: DatePickerProps) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
+  const [date, setDate] = useState<Date>(new Date());
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const formSchema = authFormSchema();
@@ -74,20 +113,72 @@ const DoctorInfoForm = () => {
     defaultValues: {
       fullname: "",
       picture: undefined,
+      dob: new Date(),
       specialization: "",
+      experience: "",
       gender: "",
       hospital: "",
       address: "",
+      number: "",
+      fees: 0,
+      bio: "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
-    form.reset();
+    form.reset({
+      fullname: "",
+      picture: undefined,
+      dob: new Date(),
+      specialization: "",
+      experience: "",
+      gender: "",
+      hospital: "",
+      address: "",
+      number: "",
+      fees: 0,
+      bio: "",
+    });
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""; // Clear the file input
+      fileInputRef.current.value = "";
     }
   };
+
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const years = Array.from(
+    { length: endYear - startYear + 1 },
+    (_, i) => startYear + i
+  );
+
+  const handleMonthChange = (month: string) => {
+    const newDate = setMonth(date, months.indexOf(month));
+    setDate(newDate);
+  };
+
+  const handleYearChange = (year: string) => {
+    const newDate = setYear(date, parseInt(year));
+    setDate(newDate);
+  };
+
+  const handleSelect = (selectedData: Date | undefined) => {
+    if (selectedData) {
+      setDate(selectedData)
+    }
+  }
 
   return (
     <div className="bg-[#fffbfc] min-h-screen">
@@ -158,6 +249,88 @@ const DoctorInfoForm = () => {
 
                 <FormField
                   control={form.control}
+                  name="dob"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col items-start">
+                      <div className="shad-form-item w-full">
+                        <FormLabel className="shad-form-label">
+                          DateTime
+                        </FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant={"ghost"}
+                              className={cn(
+                                "w-[250px] justify-start text-left font-normal px-0",
+                                !date && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {date ? (
+                                format(date, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0">
+                            <div className="flex justify-between p-2">
+                              <Select
+                                onValueChange={handleMonthChange}
+                                value={months[getMonth(date)]}
+                              >
+                                <SelectTrigger className="w-[110px]">
+                                  <SelectValue placeholder="Month" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {months.map((month) => (
+                                    <SelectItem key={month} value={month}>
+                                      {month}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <Select
+                                onValueChange={handleYearChange}
+                                value={getYear(date).toString()}
+                              >
+                                <SelectTrigger className="w-[110px]">
+                                  <SelectValue placeholder="Year" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {years.map((year) => (
+                                    <SelectItem
+                                      key={year}
+                                      value={year.toString()}
+                                    >
+                                      {year}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={handleSelect}
+                              initialFocus
+                              month={date}
+                              onMonthChange={setDate}
+                              disabled={(date) =>
+                                date > new Date() ||
+                                date < new Date("1900-01-01")
+                              }
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage className="shad-form-message" />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="specialization"
                   render={({ field }) => (
                     <FormItem>
@@ -191,6 +364,43 @@ const DoctorInfoForm = () => {
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="experience"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="shad-form-item">
+                        <FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <SelectTrigger className="border-none shadow-none p-0 h-auto focus:ring-0 focus:outline-none focus-visible:ring-0">
+                              <SelectValue
+                                placeholder="Experience"
+                                className="text-light-200 body-2 placeholder:text-light-200"
+                              />
+                            </SelectTrigger>
+                            <SelectContent className="border-none">
+                              {experience.map((value) => (
+                                <SelectItem
+                                  key={value}
+                                  value={value}
+                                  className="border-none"
+                                >
+                                  {value}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </div>
+                      <FormMessage className="shad-form-message" />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="gender"
@@ -274,23 +484,14 @@ const DoctorInfoForm = () => {
                   render={({ field }) => (
                     <FormItem>
                       <div className="shad-form-item">
-                        <FormLabel className="shad-form-label">
-                          Conatact Number
+                        <FormLabel className="shad-form-label ">
+                          Contact Number
                         </FormLabel>
                         <FormControl>
                           <Input
-                            type="number"
-                            placeholder="Enter your contact number"
+                            placeholder="Enter your hospital address"
                             className="shad-input"
                             {...field}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (/^\d*\.?\d*$/.test(value)) {
-                                field.onChange(value);
-                              }
-                            }}
-                            min={0}
-                            step={1}
                           />
                         </FormControl>
                       </div>
@@ -313,14 +514,6 @@ const DoctorInfoForm = () => {
                             placeholder="Enter your appointment fees in PKR"
                             className="shad-input"
                             {...field}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (/^\d*\.?\d*$/.test(value)) {
-                                field.onChange(value);
-                              }
-                            }}
-                            min={0}
-                            step={1}
                           />
                         </FormControl>
                       </div>
