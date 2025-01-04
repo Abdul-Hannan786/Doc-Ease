@@ -33,10 +33,11 @@ import { Calendar } from "./ui/calendar";
 import { cn } from "@/lib/utils";
 import { format, getMonth, getYear, setMonth, setYear } from "date-fns";
 
-const authFormSchema = () => {
+const DoctorFormSchema = () => {
   return z.object({
     fullname: z
       .string()
+      .nonempty("Name is required")
       .min(3, "Name must be at least 3 characters long")
       .max(50, "Name must not exceed 50 characters"),
     picture: z
@@ -48,8 +49,8 @@ const authFormSchema = () => {
           ),
         { message: "Only image files (PNG, JPEG, JPG, GIF) are allowed." }
       )
-      .refine((file) => file.size <= 5 * 1024 * 1024, {
-        message: "File size should not exceed 5MB.",
+      .refine((file) => file.size <= 3 * 1024 * 1024, {
+        message: "File size should not exceed 3MB.",
       }),
     specialization: z
       .string()
@@ -104,10 +105,9 @@ const DoctorInfoForm = ({
 }: DatePickerProps) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
-  const [date, setDate] = useState<Date>(new Date());
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const formSchema = authFormSchema();
+  const formSchema = DoctorFormSchema();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -127,22 +127,12 @@ const DoctorInfoForm = ({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
-    form.reset({
-      fullname: "",
-      picture: undefined,
-      dob: new Date(),
-      specialization: "",
-      experience: "",
-      gender: "",
-      hospital: "",
-      address: "",
-      number: "",
-      fees: 0,
-      bio: "",
-    });
+    form.reset();
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+    const age = calculateAge(values.dob);
+    console.log("Age ====>", age);
   };
 
   const months = [
@@ -159,26 +149,25 @@ const DoctorInfoForm = ({
     "November",
     "December",
   ];
+
   const years = Array.from(
     { length: endYear - startYear + 1 },
     (_, i) => startYear + i
   );
 
-  const handleMonthChange = (month: string) => {
-    const newDate = setMonth(date, months.indexOf(month));
-    setDate(newDate);
-  };
+  const calculateAge = (dob: Date): number => {
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDifference = today.getMonth() - dob.getMonth();
 
-  const handleYearChange = (year: string) => {
-    const newDate = setYear(date, parseInt(year));
-    setDate(newDate);
-  };
-
-  const handleSelect = (selectedData: Date | undefined) => {
-    if (selectedData) {
-      setDate(selectedData)
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < dob.getDate())
+    ) {
+      age--;
     }
-  }
+    return age;
+  };
 
   return (
     <div className="bg-[#fffbfc] min-h-screen">
@@ -254,7 +243,7 @@ const DoctorInfoForm = ({
                     <FormItem className="flex flex-col items-start">
                       <div className="shad-form-item w-full">
                         <FormLabel className="shad-form-label">
-                          DateTime
+                          Date of Birth
                         </FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -262,12 +251,12 @@ const DoctorInfoForm = ({
                               variant={"ghost"}
                               className={cn(
                                 "w-[250px] justify-start text-left font-normal px-0",
-                                !date && "text-muted-foreground"
+                                !field.value && "text-muted-foreground"
                               )}
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
-                              {date ? (
-                                format(date, "PPP")
+                              {field.value ? (
+                                format(field.value, "PPP")
                               ) : (
                                 <span>Pick a date</span>
                               )}
@@ -276,8 +265,16 @@ const DoctorInfoForm = ({
                           <PopoverContent className="w-auto p-0">
                             <div className="flex justify-between p-2">
                               <Select
-                                onValueChange={handleMonthChange}
-                                value={months[getMonth(date)]}
+                                onValueChange={(month) => {
+                                  const newDate = setMonth(
+                                    field.value || new Date(),
+                                    months.indexOf(month)
+                                  );
+                                  field.onChange(newDate); // Update form value
+                                }}
+                                value={
+                                  months[getMonth(field.value || new Date())]
+                                }
                               >
                                 <SelectTrigger className="w-[110px]">
                                   <SelectValue placeholder="Month" />
@@ -291,8 +288,16 @@ const DoctorInfoForm = ({
                                 </SelectContent>
                               </Select>
                               <Select
-                                onValueChange={handleYearChange}
-                                value={getYear(date).toString()}
+                                onValueChange={(year) => {
+                                  const newDate = setYear(
+                                    field.value || new Date(),
+                                    parseInt(year)
+                                  );
+                                  field.onChange(newDate); // Update form value
+                                }}
+                                value={getYear(
+                                  field.value || new Date()
+                                ).toString()}
                               >
                                 <SelectTrigger className="w-[110px]">
                                   <SelectValue placeholder="Year" />
@@ -313,10 +318,14 @@ const DoctorInfoForm = ({
                             <Calendar
                               mode="single"
                               selected={field.value}
-                              onSelect={handleSelect}
+                              onSelect={(selectedDate) => {
+                                if (selectedDate) field.onChange(selectedDate); // Update form value
+                              }}
                               initialFocus
-                              month={date}
-                              onMonthChange={setDate}
+                              month={field.value || new Date()}
+                              onMonthChange={(newDate) =>
+                                field.onChange(newDate)
+                              }
                               disabled={(date) =>
                                 date > new Date() ||
                                 date < new Date("1900-01-01")
@@ -329,6 +338,43 @@ const DoctorInfoForm = ({
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="shad-form-item">
+                        <FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <SelectTrigger className="border-none shadow-none p-0 h-auto focus:ring-0 focus:outline-none focus-visible:ring-0">
+                              <SelectValue
+                                placeholder="Gender"
+                                className="text-light-200 body-2 placeholder:text-light-200"
+                              />
+                            </SelectTrigger>
+                            <SelectContent className="border-none">
+                              <SelectItem value="Male" className="border-none">
+                                Male
+                              </SelectItem>
+                              <SelectItem
+                                value="Female"
+                                className="border-none"
+                              >
+                                Female
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </div>
+                      <FormMessage className="shad-form-message" />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="specialization"
@@ -403,41 +449,6 @@ const DoctorInfoForm = ({
 
                 <FormField
                   control={form.control}
-                  name="gender"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="shad-form-item">
-                        <FormControl>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <SelectTrigger className="border-none shadow-none p-0 h-auto focus:ring-0 focus:outline-none focus-visible:ring-0">
-                              <SelectValue
-                                placeholder="Gender"
-                                className="text-light-200 body-2 placeholder:text-light-200"
-                              />
-                            </SelectTrigger>
-                            <SelectContent className="border-none">
-                              <SelectItem value="Male" className="border-none">
-                                Male
-                              </SelectItem>
-                              <SelectItem
-                                value="Female"
-                                className="border-none"
-                              >
-                                Female
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </div>
-                      <FormMessage className="shad-form-message" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
                   name="hospital"
                   render={({ field }) => (
                     <FormItem>
@@ -457,6 +468,7 @@ const DoctorInfoForm = ({
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="address"
@@ -478,6 +490,7 @@ const DoctorInfoForm = ({
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="number"
@@ -489,7 +502,7 @@ const DoctorInfoForm = ({
                         </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Enter your hospital address"
+                            placeholder="Enter your Contact number"
                             className="shad-input"
                             {...field}
                           />
@@ -499,6 +512,7 @@ const DoctorInfoForm = ({
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="fees"
@@ -522,6 +536,7 @@ const DoctorInfoForm = ({
                   )}
                 />
               </div>
+
               <FormField
                 control={form.control}
                 name="bio"
@@ -541,6 +556,7 @@ const DoctorInfoForm = ({
                   </FormItem>
                 )}
               />
+
               <Button
                 type="submit"
                 className="modal-submit-button mb-10"
