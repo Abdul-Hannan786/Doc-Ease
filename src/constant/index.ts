@@ -14,7 +14,7 @@ export const specialization = [
   "Anesthesiologist",
   "Surgeon (General)",
   "Rheumatologist",
-  "Pulmonologist"
+  "Pulmonologist",
 ];
 
 export const experience = [
@@ -28,4 +28,22 @@ export const experience = [
   "8 years",
   "9 years",
   "10 years +",
-]
+];
+
+export const doctorNav = [
+  {
+    name: "Dashboard",
+    icon: "/images/dashboard.svg",
+    url: "/doctor",
+  },
+  {
+    name: "All Appointments",
+    icon: "/images/appointment.svg",
+    url: "/doctor/appointments",
+  },
+  {
+    name: "Profile Setting",
+    icon: "/images/profile.svg",
+    url: "/doctor/profile",
+  },
+];

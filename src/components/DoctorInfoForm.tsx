@@ -76,7 +76,7 @@ const DoctorFormSchema = () => {
       .max(15, "Number must be at most 15 characters long")
       .regex(
         /^\+?[0-9]+$/,
-        "Phone number must contain only numbers and may start with +"
+        "Phone number must only contain numbers and may start with +"
       ),
     fees: z.preprocess((value) => {
       if (value === "" || value === undefined || value === null) {

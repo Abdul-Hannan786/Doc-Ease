@@ -12,7 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Calendar } from "./ui/calendar";
 import {
   Select,
@@ -26,7 +26,7 @@ import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { format, getMonth, getYear, setMonth, setYear } from "date-fns";
-
+import Image from "next/image";
 
 interface DatePickerProps {
   startYear?: number;
@@ -39,19 +39,55 @@ const PatientFormSchema = z.object({
     .nonempty("Name is required")
     .min(3, "Name must be at least 3 characters long")
     .max(50, "Name must not exceed 50 characters"),
+  dob: z.date().refine((date) => date < new Date(), {
+    message: "Date must be in the past",
+  }),
+  gender: z
+    .string()
+    .refine(
+      (value) => ["Male", "Female"].includes(value),
+      "Please select a gender from the list."
+    ),
+  number: z
+    .string()
+    .min(11, "Number must be at least 11 characters long")
+    .max(15, "Number must be at most 15 characters long")
+    .regex(
+      /^\+?[0-9]+$/,
+      "Phone number must only contain numbers and may start with +"
+    ),
+  picture: z
+    .instanceof(File, { message: "Please select a file" })
+    .optional()
+    .refine(
+      (file) =>
+        !file || 
+        ["image/png", "image/jpeg", "image/jpg", "image/gif"].includes(
+          file.type
+        ),
+      { message: "Only image files (PNG, JPEG, JPG, GIF) are allowed." }
+    )
+    .refine((file) => !file || file.size <= 3 * 1024 * 1024, {
+      message: "File size should not exceed 3MB.",
+    }),
 });
 
 const PatientInfoForm = ({
   startYear = getYear(new Date()) - 100,
   endYear = getYear(new Date()) + 100,
 }: DatePickerProps) => {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isLoading, setIsLoading] = useState(false);
 
-   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  
   const form = useForm<z.infer<typeof PatientFormSchema>>({
     resolver: zodResolver(PatientFormSchema),
     defaultValues: {
       fullname: "",
+      dob: new Date(),
+      gender: "",
+      number: "",
+      picture: undefined,
     },
   });
 
@@ -302,8 +338,23 @@ const PatientInfoForm = ({
                     </FormItem>
                   )}
                 />
-
               </div>
+              <Button
+                type="submit"
+                className="modal-submit-button mb-10"
+                disabled={isLoading}
+              >
+                Save and Continue
+                {isLoading && (
+                  <Image
+                    src="/images/loader.svg"
+                    alt="loader"
+                    width={24}
+                    height={24}
+                    className="ml-2 animate-spin"
+                  />
+                )}
+              </Button>
             </form>
           </Form>
         </div>

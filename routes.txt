@@ -1,0 +1,12 @@
+doctor
+   /doctor                   (Dashboard)
+   /doctor/appointments      (All Appointments)
+   /doctor/profile           (Profile Settings)
+
+
+
+patient
+     /patient                 (Dashboard)
+     /patient/all-doctors     (All Doctors)
+     /patient/appointments    (My Appointments)
+     /patient/profile         (Profile Settings)
