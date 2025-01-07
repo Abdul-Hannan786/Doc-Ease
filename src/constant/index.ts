@@ -47,3 +47,10 @@ export const doctorNav = [
     url: "/doctor/profile",
   },
 ];
+
+export const patientNav = [
+  { name: "Dashboard", icon: "/images/dashboard.svg", url: "/patient" },
+  { name: "All Doctors", icon: "/images/doctor.svg", url: "/patient/all-doctors" },
+  { name: "My Appointments", icon: "/images/appointment.svg", url: "/patient/appointments" },
+  { name: "Profile Settings", icon: "/images/profile.svg", url: "/patient/profile" },
+];

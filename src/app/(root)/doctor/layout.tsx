@@ -9,7 +9,7 @@ const DoctorLayout = ({ children }: { children: ReactNode }) => {
     <main className="flex h-screen">
       <Sidebar navData={doctorNav} />
       <section className="flex h-full flex-1 flex-col">
-        <MobileNavigation />
+        <MobileNavigation navData={doctorNav}/>
         <Header />
         <div className="main-content">{children}</div>
       </section>

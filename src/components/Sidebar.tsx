@@ -43,7 +43,7 @@ const Sidebar = ({ navData }: SidebarType) => {
                   src={icon}
                   alt="name"
                   width={24}
-                  height={24} 
+                  height={24}
                   className={cn(
                     "nav-icon",
                     pathname === url && "nav-icon-active"
@@ -55,6 +55,19 @@ const Sidebar = ({ navData }: SidebarType) => {
           ))}
         </ul>
       </nav>
+      <div className="sidebar-user-info">
+        <Image
+          src={"/images/user.png"}
+          alt="Avatar"
+          width={44}
+          height={44}
+          className="sidebar-user-avatar"
+        />
+        <div className="hidden lg:block">
+          <p className="subtitle-2 capitalize">Abdul Hannan</p>
+          <p className="caption">abdulhannanhere@gmail.com</p>
+        </div>
+      </div>
     </aside>
   );
 };
