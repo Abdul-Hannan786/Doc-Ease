@@ -13,7 +13,7 @@ const Sidebar = ({ navData }: SidebarType) => {
   const pathname = usePathname();
   return (
     <aside className="sidebar">
-      <Link href={"/doctor"}>
+      <Link href={"/"}>
         <Image
           src={"/images/logo-full-brand.png"}
           alt="logo"
