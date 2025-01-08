@@ -1,9 +1,13 @@
-import React from 'react'
+import React from "react";
 
 const DoctorDashboard = () => {
   return (
-    <div className='text-3xl font-bold'>StoreIt - The only storage solution you need.</div>
-  )
-}
+    <div className="page-container">
+      <section className="w-full">
+        <h1 className="h1 capitalize">Dashboard</h1>
+      </section>
+    </div>
+  );
+};
 
-export default DoctorDashboard
+export default DoctorDashboard;
