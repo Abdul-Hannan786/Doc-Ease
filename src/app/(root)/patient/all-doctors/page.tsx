@@ -1,4 +1,5 @@
-import React from 'react'
+import DoctorCardSection from "@/components/DoctorCardSection";
+
 
 const AllDoctors = () => {
   return (
@@ -11,8 +12,11 @@ const AllDoctors = () => {
           </div>
         </div>
       </section>
+      <section>
+        <DoctorCardSection isHome={false} />
+      </section>
     </div>
-  )
-}
+  );
+};
 
-export default AllDoctors
+export default AllDoctors;

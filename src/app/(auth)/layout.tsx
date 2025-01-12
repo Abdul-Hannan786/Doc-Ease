@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 
 const AuthLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="flex min-h-screen p-3 bg-[#fdf5f8]">
+    <div className="flex min-h-screen p-3 bg-[#fcf9fa]">
       <section className="w-[35%] max-h-screen rounded-xl relative hidden items-center justify-center lg:flex">
         <Image
           src="/images/bg-1.jpg"
